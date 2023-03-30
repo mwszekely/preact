@@ -1,4 +1,5 @@
 import { _catchError } from './diff/catch-error';
+import type { Options } from './internal';
 
 /**
  * The `option` object can potentially contain callback functions
@@ -9,7 +10,7 @@ import { _catchError } from './diff/catch-error';
  * ctrl+click or cmd+click on mac the type definition below).
  * @type {import('./internal').Options}
  */
-const options = {
+const options: Options = {
 	_catchError
 };
 

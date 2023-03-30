@@ -1,4 +1,4 @@
-import * as preact from './index';
+import * as preact from './index2';
 
 export enum HookType {
 	useState = 1,
@@ -93,7 +93,10 @@ export interface PreactElement extends HTMLElement {
 
 	// style: HTMLElement["style"]; // From HTMLElement
 
-	data?: string | number; // From Text node
+	data?: string | number | {}; // From Text node
+
+	value?: any;
+	checked?: any;
 }
 
 // We use the `current` property to differentiate between the two kinds of Refs so
@@ -105,7 +108,12 @@ type Ref<T> = RefObject<T> | RefCallback<T>;
 export interface VNode<P = {}> extends preact.VNode<P> {
 	// Redefine type here using our internal ComponentType type
 	type: string | ComponentType<P>;
-	props: P & { children: ComponentChildren };
+	props: P & {
+		children: ComponentChildren;
+		is?: any;
+		type?: any;
+		dangerouslySetInnerHTML?: any;
+	};
 	ref?: Ref<any> | null;
 	_children: Array<VNode<any>> | null;
 	_parent: VNode | null;
@@ -121,7 +129,7 @@ export interface VNode<P = {}> extends preact.VNode<P> {
 	_component: Component | null;
 	_hydrating: boolean | null;
 	constructor: undefined;
-	_original: number;
+	_original: number | VNode;
 }
 
 export interface Component<P = {}, S = {}> extends preact.Component<P, S> {

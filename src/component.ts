@@ -1,7 +1,9 @@
 import { assign } from './util';
-import { diff, commitRoot } from './diff/index';
 import options from './options';
 import { Fragment } from './create-element';
+import { diff } from './diff/index.ts';
+import { commitRoot } from './diff';
+import { getDomSibling } from './get-dom-sibling.ts';
 
 /**
  * Base Component class. Provides `setState()` and `forceUpdate()`, which
@@ -24,7 +26,10 @@ export function Component(props, context) {
  * @param {() => void} [callback] A function to be called once component state is
  * updated
  */
-Component.prototype.setState = function (update, callback) {
+Component.prototype.setState = function (
+	update: object | (<T>(s: T, p: T) => T),
+	callback: () => void
+) {
 	// only clone state when copying to nextState the first time.
 	let s;
 	if (this._nextState != null && this._nextState !== this.state) {
@@ -60,7 +65,7 @@ Component.prototype.setState = function (update, callback) {
  * @param {() => void} [callback] A function to be called after component is
  * re-rendered
  */
-Component.prototype.forceUpdate = function (callback) {
+Component.prototype.forceUpdate = function (callback: () => void) {
 	if (this._vnode) {
 		// Set render mode so that we can differentiate where the render request
 		// is coming from. We need this because forceUpdate should never call
@@ -84,42 +89,10 @@ Component.prototype.forceUpdate = function (callback) {
 Component.prototype.render = Fragment;
 
 /**
- * @param {import('./internal').VNode} vnode
- * @param {number | null} [childIndex]
- */
-export function getDomSibling(vnode, childIndex) {
-	if (childIndex == null) {
-		// Use childIndex==null as a signal to resume the search from the vnode's sibling
-		return vnode._parent
-			? getDomSibling(vnode._parent, vnode._parent._children.indexOf(vnode) + 1)
-			: null;
-	}
-
-	let sibling;
-	for (; childIndex < vnode._children.length; childIndex++) {
-		sibling = vnode._children[childIndex];
-
-		if (sibling != null && sibling._dom != null) {
-			// Since updateParentDomPointers keeps _dom pointer correct,
-			// we can rely on _dom to tell us if this subtree contains a
-			// rendered DOM node, and what the first rendered DOM node is
-			return sibling._dom;
-		}
-	}
-
-	// If we get here, we have not found a DOM node in this vnode's children.
-	// We must resume from this vnode's sibling (in it's parent _children array)
-	// Only climb up and search the parent if we aren't searching through a DOM
-	// VNode (meaning we reached the DOM parent of the original vnode that began
-	// the search)
-	return typeof vnode.type == 'function' ? getDomSibling(vnode) : null;
-}
-
-/**
  * Trigger in-place re-rendering of a component.
  * @param {import('./internal').Component} component The component to rerender
  */
-function renderComponent(component) {
+function renderComponent(component: import('./internal').Component) {
 	let vnode = component._vnode,
 		oldDom = vnode._dom,
 		parentDom = component._parentDom;

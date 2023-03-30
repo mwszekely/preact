@@ -9,8 +9,9 @@
       "preact": ["."],
       "preact/*": ["./*"]
     },
-    "reactNamespace": "createElement",
-    "target": "es5"
+    "target": "es5",
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   },
   "exclude": ["node_modules", "dist", "demo"]
 }

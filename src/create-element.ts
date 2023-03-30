@@ -1,5 +1,6 @@
 import { slice } from './util';
 import options from './options';
+import { ComponentChildren, VNode } from './internal';
 
 let vnodeId = 0;
 
@@ -11,8 +12,12 @@ let vnodeId = 0;
  * @param {Array<import('.').ComponentChildren>} [children] The children of the virtual node
  * @returns {import('./internal').VNode}
  */
-export function createElement(type, props, children) {
-	let normalizedProps = {},
+export function createElement(
+	type: VNode['type'],
+	props: VNode['props'],
+	children: ComponentChildren
+) {
+	let normalizedProps = {} as { children?: preact.ComponentChild | undefined },
 		key,
 		ref,
 		i;
@@ -37,7 +42,7 @@ export function createElement(type, props, children) {
 		}
 	}
 
-	return createVNode(type, normalizedProps, key, ref, null);
+	return createVNode(type, normalizedProps as any, key, ref, null);
 }
 
 /**
@@ -52,12 +57,18 @@ export function createElement(type, props, children) {
  * receive a reference to its created child
  * @returns {import('./internal').VNode}
  */
-export function createVNode(type, props, key, ref, original) {
+export function createVNode(
+	type: VNode['type'],
+	props: VNode['props'] | string | number | bigint | null,
+	key: string | number | null,
+	ref: VNode['ref'],
+	original: VNode | string | number | bigint | null
+): VNode {
 	// V8 seems to be better at detecting type shapes if the object is allocated from the same call site
 	// Do not inline into createElement and coerceToVNode!
 	const vnode = {
 		type,
-		props,
+		props: props as any,
 		key,
 		ref,
 		_children: null,
@@ -72,13 +83,13 @@ export function createVNode(type, props, key, ref, original) {
 		_component: null,
 		_hydrating: null,
 		constructor: undefined,
-		_original: original == null ? ++vnodeId : original
-	};
+		_original: original == null ? ++vnodeId : (original as VNode)
+	} satisfies VNode;
 
 	// Only invoke the vnode hook if this was *not* a direct copy:
-	if (original == null && options.vnode != null) options.vnode(vnode);
+	if (original == null && options.vnode != null) options.vnode(vnode as VNode);
 
-	return vnode;
+	return vnode as VNode;
 }
 
 export function createRef() {

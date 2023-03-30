@@ -1,3 +1,5 @@
+import type { Component, ComponentType, ErrorInfo, VNode } from '../internal';
+
 /**
  * Find the closest error boundary to a thrown error and call it
  * @param {object} error The thrown value
@@ -7,9 +9,14 @@
  * @param {import('../internal').VNode} [oldVNode]
  * @param {import('../internal').ErrorInfo} [errorInfo]
  */
-export function _catchError(error, vnode, oldVNode, errorInfo) {
+export function _catchError(
+	error,
+	vnode: VNode,
+	oldVNode: VNode,
+	errorInfo: ErrorInfo
+) {
 	/** @type {import('../internal').Component} */
-	let component, ctor, handled;
+	let component: Component, ctor: ComponentType<{}>, handled: boolean;
 
 	for (; (vnode = vnode._parent); ) {
 		if ((component = vnode._component) && !component._processingException) {

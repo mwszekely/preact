@@ -1,5 +1,6 @@
 import { assign, slice } from './util';
 import { createVNode } from './create-element';
+import type { VNode, ComponentChildren } from './internal';
 
 /**
  * Clones the given VNode, optionally adding attributes/props and replacing its children.
@@ -8,7 +9,11 @@ import { createVNode } from './create-element';
  * @param {Array<import('./internal').ComponentChildren>} rest Any additional arguments will be used as replacement children.
  * @returns {import('./internal').VNode}
  */
-export function cloneElement(vnode, props, children) {
+export function cloneElement(
+	vnode: VNode,
+	props: {},
+	children: ComponentChildren
+): VNode {
 	let normalizedProps = assign({}, vnode.props),
 		key,
 		ref,

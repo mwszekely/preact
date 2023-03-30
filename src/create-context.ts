@@ -68,6 +68,8 @@ export function createContext(defaultValue, contextId) {
 	// of on the component itself. See:
 	// https://reactjs.org/docs/context.html#contextdisplayname
 
-	return (context.Provider._contextRef = context.Consumer.contextType =
+	return ((context.Provider as any)._contextRef = (
+		context.Consumer as any
+	).contextType =
 		context);
 }

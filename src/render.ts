@@ -1,8 +1,9 @@
 import { EMPTY_OBJ } from './constants';
-import { commitRoot, diff } from './diff/index';
 import { createElement, Fragment } from './create-element';
+import { commitRoot, diff } from './diff';
 import options from './options';
 import { slice } from './util';
+import type { ComponentChild, PreactElement, VNode } from './internal';
 
 /**
  * Render a Preact virtual node into a DOM element
@@ -12,7 +13,11 @@ import { slice } from './util';
  * @param {import('./internal').PreactElement | object} [replaceNode] Optional: Attempt to re-use an
  * existing DOM tree rooted at `replaceNode`
  */
-export function render(vnode, parentDom, replaceNode) {
+export function render(
+	vnode: ComponentChild,
+	parentDom: PreactElement,
+	replaceNode: PreactElement | typeof hydrate
+) {
 	if (options._root) options._root(vnode, parentDom);
 
 	// We abuse the `replaceNode` parameter in `hydrate()` to signal if we are in
@@ -27,10 +32,12 @@ export function render(vnode, parentDom, replaceNode) {
 	// means that we are mounting a new tree for the first time.
 	let oldVNode = isHydrating
 		? null
-		: (replaceNode && replaceNode._children) || parentDom._children;
+		: (replaceNode && (replaceNode as PreactElement)._children) ||
+		  parentDom._children;
 
-	vnode = ((!isHydrating && replaceNode) || parentDom)._children =
-		createElement(Fragment, null, [vnode]);
+	vnode = (
+		((!isHydrating && replaceNode) || parentDom) as PreactElement
+	)._children = createElement(Fragment, null, [vnode]);
 
 	// List of effects that need to be called after diffing.
 	let commitQueue = [];
@@ -39,7 +46,7 @@ export function render(vnode, parentDom, replaceNode) {
 		// Determine the new vnode tree and store it on the DOM element on
 		// our custom `_children` property.
 		vnode,
-		oldVNode || EMPTY_OBJ,
+		oldVNode || (EMPTY_OBJ as VNode),
 		EMPTY_OBJ,
 		parentDom.ownerSVGElement !== undefined,
 		!isHydrating && replaceNode
@@ -50,11 +57,11 @@ export function render(vnode, parentDom, replaceNode) {
 			? slice.call(parentDom.childNodes)
 			: null,
 		commitQueue,
-		!isHydrating && replaceNode
+		(!isHydrating && replaceNode
 			? replaceNode
 			: oldVNode
 			? oldVNode._dom
-			: parentDom.firstChild,
+			: parentDom.firstChild) as PreactElement,
 		isHydrating
 	);
 

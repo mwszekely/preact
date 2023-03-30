@@ -1,4 +1,5 @@
 import { IS_NON_DIMENSIONAL } from '../constants';
+import { PreactElement } from '../internal';
 import options from '../options';
 
 /**
@@ -10,7 +11,13 @@ import options from '../options';
  * @param {boolean} isSvg Whether or not this node is an SVG node
  * @param {boolean} hydrate Whether or not we are in hydration mode
  */
-export function diffProps(dom, newProps, oldProps, isSvg, hydrate) {
+export function diffProps(
+	dom: PreactElement,
+	newProps: {},
+	oldProps: {},
+	isSvg: boolean,
+	hydrate: boolean
+) {
 	let i;
 
 	for (i in oldProps) {

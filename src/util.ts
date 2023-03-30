@@ -7,10 +7,10 @@ import { EMPTY_ARR } from './constants';
  * @param {P} props The object to copy properties from
  * @returns {O & P}
  */
-export function assign(obj, props) {
+export function assign<O, P>(obj: O, props: P): O & P {
 	// @ts-ignore We change the type of `obj` to be `O & P`
 	for (let i in props) obj[i] = props[i];
-	return /** @type {O & P} */ (obj);
+	return obj as O & P;
 }
 
 /**
@@ -19,7 +19,7 @@ export function assign(obj, props) {
  * is smaller than including a dedicated polyfill.
  * @param {Node} node The node to remove
  */
-export function removeNode(node) {
+export function removeNode(node: Node) {
 	let parentNode = node.parentNode;
 	if (parentNode) parentNode.removeChild(node);
 }
